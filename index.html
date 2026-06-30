@@ -378,7 +378,27 @@
       if(ahora-ultimo<=300 && !ctrl){ e.preventDefault(); } ultimo=ahora; }, {passive:false});
     document.addEventListener("gesturestart", function(e){ e.preventDefault(); });
 
-    if("serviceWorker" in navigator){ window.addEventListener("load", function(){ navigator.serviceWorker.register("./sw.js").catch(function(){}); }); }
+    /* ── Service worker con auto-actualización ──
+       El SW sirve el HTML con estrategia "red primero", así los cambios del index
+       aparecen al abrir la app. Acá además: buscamos versión nueva al abrir y al
+       volver al frente, y si entra un SW nuevo, recargamos solos (una vez). */
+    if("serviceWorker" in navigator){
+      var hadController = !!navigator.serviceWorker.controller;
+      var refreshing = false;
+      navigator.serviceWorker.addEventListener("controllerchange", function(){
+        if(refreshing || !hadController) return;  // no recargar en la primera instalación
+        refreshing = true;
+        window.location.reload();
+      });
+      window.addEventListener("load", function(){
+        navigator.serviceWorker.register("./sw.js", { updateViaCache:"none" }).then(function(reg){
+          reg.update();
+          document.addEventListener("visibilitychange", function(){
+            if(document.visibilityState === "visible") reg.update();
+          });
+        }).catch(function(){});
+      });
+    }
   })();
   </script>
 </body>

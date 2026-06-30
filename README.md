@@ -68,7 +68,7 @@ El cronómetro corre aparte del marcador; solo si deshacés el punto que ganó e
 3. Entrá a `https://<usuario>.github.io/<repo>/`.
 4. En el celu: **Compartir → Agregar a inicio** (iOS) o **Instalar app** (Android/Chrome).
 
-> Si actualizás `index.html`, subí la versión de cache en `sw.js` (`const CACHE = "tenis-v3"`, etc.) para que el service worker traiga la versión nueva en vez de la cacheada.
+> **Auto-actualización:** el `sw.js` sirve el `index.html` con estrategia *red primero*, así que **cada vez que cambiás el `index.html` y lo subís, la persona ve la versión nueva al abrir la app** (con internet) — no hace falta tocar nada más. Si la app está abierta cuando hay versión nueva, se recarga sola. Solo si modificás **`sw.js`** conviene subir el número de `CACHE` (`tenis-cache-v4`, etc.) para forzar el recambio del propio service worker.
 
 ---
 
