@@ -1,7 +1,7 @@
 /* Service worker del Anotador de Tenis
    Estrategia: cache-first del app shell. Subí el número de versión
    (CACHE) cada vez que cambies index.html para forzar la actualización. */
-const CACHE = "tenis-v1";
+const CACHE = "tenis-v2";
 
 const ASSETS = [
   "./",

@@ -3,10 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <meta name="theme-color" content="#c05143" />
+  <meta name="theme-color" content="#b94a3c" />
   <title>Tenis</title>
 
-  <!-- PWA -->
   <link rel="manifest" href="./manifest.json" />
   <link rel="icon" href="./Logo.png" />
   <link rel="apple-touch-icon" href="./Logo.png" />
@@ -18,471 +17,368 @@
 
   <style>
     :root{
-      --terra:#c05143; --terra-hi:#cd5e50; --terra-lo:#a8463a; --terra-deep:#8f3a30;
-      --tiza:#fbf6f1; --tiza-tenue:rgba(251,246,241,.45); --tiza-tenue2:rgba(251,246,241,.22);
-      --lima:#dbe35a;            /* amarillo pelota: ventaja / acentos */
-      --linea:rgba(251,246,241,.30);
+      --terra:#bf4f41; --terra-hi:#cf6253; --terra-lo:#a8463a; --terra-deep:#7e3329;
+      --tiza:#fbf6f1; --tiza-tenue:rgba(251,246,241,.5); --linea:rgba(251,246,241,.22);
+      --lima:#e2e85a; --lima-deep:#7e3329;
+      --panel:#4f241c; --panel-2:#3a1810;
+      --cancha:rgba(251,246,241,.42);
+      --sombra:0 6px 18px rgba(0,0,0,.30);
       --disp:'Oswald','Helvetica Neue',Arial,sans-serif;
       --sys:-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;
     }
     *{ box-sizing:border-box; }
     html,body{ margin:0; padding:0; height:100%; overscroll-behavior:none; }
-    html{ background:var(--terra); }
+    html{ background:var(--terra-lo); }
     body{
       position:fixed; inset:0;
-      background:radial-gradient(125% 120% at 50% 0%, var(--terra-hi), var(--terra-lo));
+      background:radial-gradient(130% 120% at 50% 0%, var(--terra-hi), var(--terra-lo));
       color:var(--tiza); font-family:var(--sys);
       display:flex; align-items:center; justify-content:center;
-      padding:14px;
-      padding-top:max(14px, env(safe-area-inset-top));
-      padding-bottom:max(14px, env(safe-area-inset-bottom));
-      touch-action:manipulation;
-      -webkit-tap-highlight-color:transparent;
-      -webkit-user-select:none; user-select:none;
+      padding:14px; padding-top:max(14px, env(safe-area-inset-top)); padding-bottom:max(14px, env(safe-area-inset-bottom));
+      touch-action:manipulation; -webkit-tap-highlight-color:transparent; -webkit-user-select:none; user-select:none;
     }
-    #app{ width:100%; max-width:520px; max-height:100%; overflow-y:auto; -webkit-overflow-scrolling:touch; }
 
-    /* ───────── Pantalla de configuración ───────── */
+    .court{ position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+    .court svg{ width:100%; height:100%; display:block; }
+    .court::after{ content:""; position:absolute; inset:0; background:radial-gradient(120% 90% at 50% 38%, transparent 55%, rgba(0,0,0,.28)); }
+
+    #app{ position:relative; z-index:1; width:100%; max-width:520px; max-height:100%; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+
     .setup{ text-align:center; padding:6px 4px 18px; }
-    .logo{ display:block; width:clamp(92px,26vw,128px); height:auto; margin:4px auto 6px;
-      border-radius:24px; filter:drop-shadow(0 6px 14px rgba(0,0,0,.35)); }
-    .title{ font-family:var(--disp); font-weight:700; font-size:clamp(30px,8vw,44px);
-      letter-spacing:2px; text-transform:uppercase; margin:2px 0 0; }
-    .subtitle{ font-family:var(--sys); font-size:14px; opacity:.85; margin:2px 0 22px; letter-spacing:.3px; }
-
+    .logo{ display:block; width:clamp(88px,24vw,120px); height:auto; margin:4px auto 6px; border-radius:24px; filter:drop-shadow(0 6px 16px rgba(0,0,0,.4)); }
+    .title{ font-family:var(--disp); font-weight:700; font-size:clamp(30px,8vw,44px); letter-spacing:2px; text-transform:uppercase; margin:2px 0 0; text-shadow:0 2px 8px rgba(0,0,0,.3); }
+    .subtitle{ font-size:14px; opacity:.85; margin:2px 0 22px; letter-spacing:.3px; }
     .field{ text-align:left; margin:0 auto 14px; max-width:380px; }
-    .field label{ display:block; font-family:var(--disp); font-weight:600; font-size:13px;
-      letter-spacing:1.5px; text-transform:uppercase; opacity:.85; margin:0 0 6px 4px; }
-    .field input{ width:100%; font-size:18px; font-family:var(--sys); color:var(--tiza);
-      background:rgba(0,0,0,.16); border:2px solid var(--linea); border-radius:12px;
-      padding:13px 14px; outline:none; transition:border-color .15s ease, background .15s ease; }
+    .field label{ display:block; font-family:var(--disp); font-weight:600; font-size:13px; letter-spacing:1.5px; text-transform:uppercase; opacity:.85; margin:0 0 6px 4px; }
+    .field input{ width:100%; font-size:18px; font-family:var(--sys); color:var(--tiza); background:var(--panel); border:2px solid var(--linea); border-radius:12px; padding:13px 14px; outline:none; box-shadow:var(--sombra); transition:border-color .15s; }
     .field input::placeholder{ color:var(--tiza-tenue); }
-    .field input:focus{ border-color:var(--lima); background:rgba(0,0,0,.24); }
-
-    .seclabel{ font-family:var(--disp); font-weight:600; font-size:13px; letter-spacing:1.5px;
-      text-transform:uppercase; opacity:.85; text-align:left; max-width:380px; margin:18px auto 8px; padding-left:4px; }
+    .field input:focus{ border-color:var(--lima); }
+    .seclabel{ font-family:var(--disp); font-weight:600; font-size:13px; letter-spacing:1.5px; text-transform:uppercase; opacity:.85; text-align:left; max-width:380px; margin:18px auto 8px; padding-left:4px; }
     .opciones{ display:flex; gap:10px; justify-content:center; max-width:380px; margin:0 auto; }
-    .opt{ flex:1; font-family:var(--disp); font-weight:600; font-size:15px; color:var(--tiza);
-      background:rgba(0,0,0,.16); border:2px solid var(--linea); border-radius:12px;
-      padding:14px 6px; cursor:pointer; line-height:1.2; transition:transform .1s ease, background .12s, border-color .12s; }
+    .opt{ flex:1; font-family:var(--disp); font-weight:600; font-size:15px; color:var(--tiza); background:var(--panel); border:2px solid var(--linea); border-radius:12px; padding:14px 6px; cursor:pointer; line-height:1.2; box-shadow:var(--sombra); transition:transform .1s, background .12s, border-color .12s; }
     .opt small{ display:block; font-weight:500; font-size:11px; opacity:.7; letter-spacing:.5px; }
-    .opt.activo{ background:var(--lima); color:var(--terra-deep); border-color:var(--lima); }
+    .opt.activo{ background:var(--lima); color:var(--lima-deep); border-color:var(--lima); }
     .opt:active{ transform:scale(.97); }
-
-    .jugar{ display:block; width:100%; max-width:380px; margin:26px auto 0;
-      font-family:var(--disp); font-weight:700; font-size:22px; letter-spacing:2px; text-transform:uppercase;
-      color:var(--terra-deep); background:var(--lima); border:none; border-radius:14px;
-      padding:16px; cursor:pointer; box-shadow:0 8px 20px rgba(0,0,0,.28); transition:transform .1s ease; }
+    .jugar{ display:block; width:100%; max-width:380px; margin:26px auto 0; font-family:var(--disp); font-weight:700; font-size:22px; letter-spacing:2px; text-transform:uppercase; color:var(--lima-deep); background:var(--lima); border:none; border-radius:14px; padding:16px; cursor:pointer; box-shadow:0 8px 22px rgba(0,0,0,.32); transition:transform .1s; }
     .jugar:active{ transform:scale(.98); }
 
-    /* ───────── Tablero ───────── */
-    .board{ display:flex; flex-direction:column; min-height:0; }
+    .serve{ text-align:center; padding:10px 4px 18px; }
+    .serve .title{ font-size:clamp(24px,7vw,34px); }
+    .serve .ball{ font-size:46px; margin:8px 0 4px; }
+    .serve-opts{ display:flex; flex-direction:column; gap:14px; max-width:360px; margin:24px auto 0; }
+    .serve-btn{ font-family:var(--disp); font-weight:700; font-size:22px; letter-spacing:1px; color:var(--tiza); background:var(--panel); border:2px solid var(--linea); border-radius:14px; padding:20px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:12px; box-shadow:var(--sombra); transition:transform .1s, background .12s, border-color .12s; }
+    .serve-btn:active{ transform:scale(.98); background:var(--lima); color:var(--lima-deep); border-color:var(--lima); }
+    .serve-back{ margin-top:20px; }
 
-    /* fila de sets ganados (arriba de todo) */
-    .setsbar{ display:flex; align-items:center; justify-content:center; gap:10px;
-      font-family:var(--disp); font-weight:600; margin-bottom:10px; }
-    .setsbar .sname{ font-size:13px; letter-spacing:1px; text-transform:uppercase; opacity:.8; }
-    .setsbar .scount{ font-size:34px; line-height:1; }
-    .setsbar .vs{ font-size:13px; opacity:.6; letter-spacing:1px; }
+    .board{ display:flex; flex-direction:column; }
+    .topbar{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
+    .clock{ font-family:var(--disp); font-weight:700; font-size:20px; letter-spacing:1px; font-variant-numeric:tabular-nums; background:var(--panel); border:1px solid var(--linea); border-radius:10px; padding:7px 14px; box-shadow:var(--sombra); }
+    .clock .ico{ opacity:.65; margin-right:5px; }
+    .playpause{ font-family:var(--disp); font-weight:600; font-size:14px; letter-spacing:1px; text-transform:uppercase; cursor:pointer; border-radius:10px; padding:10px 18px; box-shadow:var(--sombra); transition:transform .1s; }
+    .playpause.run{ background:var(--lima); color:var(--lima-deep); border:none; }
+    .playpause.stop{ background:var(--panel); color:var(--tiza); border:1px solid var(--linea); }
+    .playpause:active{ transform:scale(.97); }
 
-    .estado{ text-align:center; font-family:var(--disp); font-weight:600; font-size:14px;
-      letter-spacing:2px; text-transform:uppercase; min-height:18px; margin-bottom:10px; color:var(--lima); }
-    .estado.calmo{ color:var(--tiza-tenue); }
+    .sb{ background:var(--panel); border:1px solid var(--linea); border-radius:14px; padding:9px 12px; margin-bottom:14px; box-shadow:var(--sombra); }
+    .sb-row{ display:flex; align-items:center; }
+    .sb-row + .sb-row{ margin-top:5px; }
+    .sb-name{ flex:1; min-width:0; font-family:var(--disp); font-weight:600; font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:flex; align-items:center; gap:7px; }
+    .sb-cell{ width:30px; text-align:center; font-family:var(--disp); font-weight:600; font-size:17px; }
+    .sb-sets{ width:36px; text-align:center; font-family:var(--disp); font-weight:700; font-size:22px; }
+    .sb-cur{ color:var(--lima); }
+    .sb-closed{ opacity:.5; }
+    .sb-head .sb-cell, .sb-head .sb-sets{ font-size:10px; letter-spacing:1px; opacity:.65; font-weight:600; }
+    .sb-head .sb-cur{ opacity:.95; }
+    .sb-head{ margin-bottom:3px; }
+    .dot{ width:10px; height:10px; border-radius:50%; background:var(--lima); flex:none; box-shadow:0 0 0 2px rgba(0,0,0,.25); }
 
-    /* dos columnas de jugadores */
-    .players{ display:flex; gap:10px; }
-    .pcol{ flex:1; min-width:0; display:flex; flex-direction:column;
-      background:rgba(0,0,0,.14); border:2px solid var(--linea); border-radius:16px;
-      padding:14px 10px 12px; }
-    .pcol.saca{ border-color:var(--lima); }
+    .banner{ text-align:center; min-height:34px; margin:2px 0 8px; display:flex; align-items:center; justify-content:center; }
+    .pill{ display:inline-block; background:var(--lima); color:var(--lima-deep); font-family:var(--disp); font-weight:700; font-size:16px; letter-spacing:2px; text-transform:uppercase; padding:6px 20px; border-radius:999px; box-shadow:0 4px 14px rgba(0,0,0,.3); }
+    .pill.deuce{ background:var(--tiza); }
+    .banner .calm{ font-family:var(--disp); font-weight:600; font-size:13px; letter-spacing:1.5px; text-transform:uppercase; opacity:.7; }
 
-    .pname{ font-family:var(--disp); font-weight:700; font-size:clamp(16px,5vw,22px);
-      text-align:center; letter-spacing:.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-      margin-bottom:2px; }
-    .saca-dot{ display:inline-block; width:9px; height:9px; border-radius:50%; background:var(--lima);
-      margin-left:6px; vertical-align:middle; }
-
-    .punto{ font-family:var(--disp); font-weight:700; line-height:1;
-      font-size:clamp(64px,22vw,104px); text-align:center; font-variant-numeric:tabular-nums;
-      margin:6px 0 8px; }
-    .punto.ad{ color:var(--lima); }
-
-    .games-row{ text-align:center; font-family:var(--disp); font-weight:600; font-size:13px;
-      letter-spacing:1.5px; text-transform:uppercase; opacity:.7; margin-bottom:12px; }
-    .games-row b{ font-size:20px; font-weight:700; opacity:1; }
-
-    .pbtns{ display:flex; gap:8px; margin-top:auto; }
-    .pbtn{ flex:1; display:flex; align-items:center; justify-content:center; height:62px;
-      border-radius:14px; cursor:pointer; touch-action:manipulation;
-      transition:transform .08s ease, background .12s ease, opacity .12s; }
+    .scorebig{ display:flex; gap:12px; }
+    .bigcol{ flex:1; min-width:0; display:flex; flex-direction:column; align-items:center; background:var(--panel); border:2px solid var(--linea); border-radius:18px; padding:14px 8px 12px; box-shadow:var(--sombra); }
+    .bigcol.saca{ border-color:var(--lima); }
+    .bigname{ font-family:var(--disp); font-weight:700; font-size:clamp(15px,4.6vw,20px); letter-spacing:.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; text-align:center; }
+    .bignum{ font-family:var(--disp); font-weight:700; line-height:.95; font-variant-numeric:tabular-nums; font-size:clamp(58px,19vw,92px); margin:8px 0 12px; }
+    .bignum.ad{ color:var(--lima); }
+    .bigbtns{ display:flex; gap:8px; width:100%; margin-top:auto; }
+    .pbtn{ flex:1; display:flex; align-items:center; justify-content:center; height:60px; border-radius:14px; cursor:pointer; touch-action:manipulation; transition:transform .08s, background .12s, opacity .12s; }
     .pbtn svg{ width:30px; height:30px; stroke-width:3; stroke-linecap:round; display:block; }
     .pbtn.mas{ background:var(--lima); }
-    .pbtn.mas svg{ stroke:var(--terra-deep); }
-    .pbtn.menos{ background:rgba(0,0,0,.20); border:2px solid var(--linea); }
+    .pbtn.mas svg{ stroke:var(--lima-deep); }
+    .pbtn.menos{ background:var(--panel-2); border:2px solid var(--linea); }
     .pbtn.menos svg{ stroke:var(--tiza); }
-    .pbtn.menos[disabled]{ opacity:.32; }
-    .pbtn:active{ transform:scale(.95); }
+    .pbtn.menos[disabled]{ opacity:.3; }
+    .pbtn:active{ transform:scale(.94); }
 
-    /* sets jugados (historial 6-4 3-6 ...) */
-    .historial{ text-align:center; font-family:var(--disp); font-weight:600; font-size:15px;
-      letter-spacing:2px; min-height:20px; margin-top:14px; opacity:.85; }
-    .historial .sg{ display:inline-block; margin:0 5px; }
-
-    /* acciones inferiores */
-    .acciones{ display:flex; justify-content:center; gap:24px; margin-top:14px;
-      border-top:1px solid var(--linea); padding-top:12px; }
-    .link{ font-family:var(--sys); font-size:14px; color:var(--tiza); opacity:.85;
-      background:none; border:none; cursor:pointer; text-decoration:underline; text-underline-offset:3px; }
+    .acciones{ display:flex; justify-content:center; gap:24px; margin-top:16px; border-top:1px solid var(--linea); padding-top:12px; }
+    .link{ font-family:var(--sys); font-size:14px; color:var(--tiza); opacity:.85; background:none; border:none; cursor:pointer; text-decoration:underline; text-underline-offset:3px; }
     .link:active{ opacity:.6; }
     .link[disabled]{ opacity:.3; text-decoration:none; cursor:default; }
 
-    /* ───────── Overlay ganador / confirmaciones ───────── */
-    .overlay{ position:fixed; inset:0; background:rgba(0,0,0,.6); backdrop-filter:blur(3px);
-      display:flex; align-items:center; justify-content:center; padding:22px; z-index:20; }
-    .card{ background:var(--terra-lo); border:2px solid var(--lima); border-radius:18px;
-      padding:28px 24px; text-align:center; max-width:340px; box-shadow:0 16px 40px rgba(0,0,0,.5); }
-    .card h2{ font-family:var(--disp); font-weight:700; font-size:clamp(26px,7vw,34px);
-      letter-spacing:1px; margin:0 0 6px; text-transform:uppercase; }
-    .card .res{ font-family:var(--disp); font-weight:600; font-size:16px; letter-spacing:1.5px;
-      opacity:.85; margin:0 0 20px; }
-    .card .row{ display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
-    .btn{ font-family:var(--disp); font-weight:600; font-size:15px; letter-spacing:1px; text-transform:uppercase;
-      border-radius:12px; padding:13px 22px; cursor:pointer; border:2px solid var(--lima); }
-    .btn.solid{ background:var(--lima); color:var(--terra-deep); }
+    .overlay{ position:fixed; inset:0; background:rgba(0,0,0,.62); backdrop-filter:blur(3px); display:flex; align-items:center; justify-content:center; padding:22px; z-index:20; }
+    .overlay.top{ z-index:30; }
+    .card{ background:var(--panel); border:2px solid var(--lima); border-radius:18px; padding:26px 22px; text-align:center; max-width:360px; width:100%; box-shadow:0 16px 40px rgba(0,0,0,.6); }
+    .card h2{ font-family:var(--disp); font-weight:700; font-size:clamp(26px,7vw,34px); letter-spacing:1px; margin:0 0 6px; text-transform:uppercase; }
+    .card .res{ font-family:var(--disp); font-weight:600; font-size:17px; letter-spacing:1.5px; opacity:.9; margin:0 0 8px; }
+    .card .tiempo{ font-family:var(--disp); font-weight:600; font-size:14px; letter-spacing:1px; opacity:.75; margin:0 0 20px; }
+    .card .row{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+    .btn{ font-family:var(--disp); font-weight:600; font-size:15px; letter-spacing:1px; text-transform:uppercase; border-radius:12px; padding:13px 20px; cursor:pointer; border:2px solid var(--lima); }
+    .btn.solid{ background:var(--lima); color:var(--lima-deep); }
     .btn.ghost{ background:transparent; color:var(--tiza); border-color:var(--linea); }
     .btn:active{ transform:scale(.97); }
+    .sharebox{ width:100%; font-family:var(--sys); font-size:14px; line-height:1.5; color:var(--tiza); background:var(--panel-2); border:1px solid var(--linea); border-radius:12px; padding:14px; resize:none; margin:4px 0 18px; }
 
-    .pbtn:focus-visible,.opt:focus-visible,.jugar:focus-visible,.btn:focus-visible,.link:focus-visible,.field input:focus-visible{
-      outline:3px solid var(--lima); outline-offset:2px; }
-
-    @media (max-width:360px){ .pcol{ padding:12px 7px 10px; } .players{ gap:8px; } }
+    .pbtn:focus-visible,.opt:focus-visible,.jugar:focus-visible,.btn:focus-visible,.link:focus-visible,.serve-btn:focus-visible,.field input:focus-visible,.playpause:focus-visible{ outline:3px solid var(--lima); outline-offset:2px; }
+    @media (max-width:360px){ .bigcol{ padding:12px 6px 10px; } .scorebig{ gap:8px; } .sb-cell{ width:26px; } }
   </style>
 </head>
 <body>
+  <div class="court" aria-hidden="true">
+    <svg viewBox="0 0 360 760" preserveAspectRatio="xMidYMid slice">
+      <g fill="none" stroke="var(--cancha)" stroke-width="2.2">
+        <rect x="36" y="68" width="288" height="624" />
+        <line x1="72"  y1="68" x2="72"  y2="692" />
+        <line x1="288" y1="68" x2="288" y2="692" />
+        <line x1="72" y1="212" x2="288" y2="212" />
+        <line x1="72" y1="548" x2="288" y2="548" />
+        <line x1="180" y1="212" x2="180" y2="548" />
+        <line x1="180" y1="68" x2="180" y2="80" />
+        <line x1="180" y1="680" x2="180" y2="692" />
+      </g>
+      <line x1="28" y1="380" x2="332" y2="380" stroke="var(--cancha)" stroke-width="3" stroke-dasharray="2 5" />
+      <line x1="36" y1="380" x2="324" y2="380" stroke="var(--cancha)" stroke-width="2.4" />
+    </svg>
+  </div>
+
   <div id="app"></div>
 
   <script>
   (function(){
     "use strict";
-
     var KEY = "tenis_estado_v1";
 
-    // setsToWin se deriva de bestOf: al mejor de 3 -> ganar 2; de 5 -> ganar 3; 1 set -> ganar 1
     var state = {
-      screen: "setup",         // "setup" | "game"
-      names: ["", ""],
-      bestOf: 3,               // 1 | 3 | 5
-      points: [0,0],           // contador crudo de puntos del game actual
-      games: [0,0],            // games del set en curso
-      sets: [0,0],             // sets ganados
-      setHistory: [],          // [[g1,g2], ...] de sets cerrados
-      tiebreak: false,
-      tbPoints: [0,0],
-      server: 0,               // quién saca (0|1), solo informativo
-      winner: null,            // 0 | 1 | null
-      history: []              // pila de snapshots para deshacer
+      screen:"setup", names:["",""], bestOf:3,
+      points:[0,0], games:[0,0], sets:[0,0], setHistory:[],
+      tiebreak:false, tbPoints:[0,0], server:0, winner:null, history:[],
+      timer:{ running:false, startedAt:0, accumulated:0, started:false, frozenByWin:false },
+      sharing:false
     };
 
-    /* ── Persistencia ── */
-    function save(){
-      try{
-        var s = Object.assign({}, state);
-        localStorage.setItem(KEY, JSON.stringify(s));
-      }catch(e){}
-    }
-    function load(){
-      try{
-        var raw = localStorage.getItem(KEY);
-        if(!raw) return;
-        var s = JSON.parse(raw);
-        for(var k in s){ if(s.hasOwnProperty(k)) state[k] = s[k]; }
-      }catch(e){}
+    function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+    function load(){ try{ var raw=localStorage.getItem(KEY); if(!raw) return; var s=JSON.parse(raw);
+      for(var k in s){ if(s.hasOwnProperty(k)) state[k]=s[k]; }
+      if(!state.timer) state.timer={running:false,startedAt:0,accumulated:0,started:false,frozenByWin:false};
+    }catch(e){} }
+
+    function setsToWin(){ return state.bestOf===1 ? 1 : (state.bestOf+1)/2; }
+    function nombre(i){ return state.names[i] && state.names[i].trim() ? state.names[i].trim() : ("Jugador "+(i+1)); }
+
+    function elapsedMs(){ var t=state.timer; return t.accumulated + (t.running ? (Date.now()-t.startedAt) : 0); }
+    function fmt(ms){ var s=Math.floor(ms/1000), h=Math.floor(s/3600), m=Math.floor((s%3600)/60), ss=s%60;
+      function p(n){ return (n<10?"0":"")+n; } return h>0 ? h+":"+p(m)+":"+p(ss) : m+":"+p(ss); }
+    function startTimerIfNeeded(){ var t=state.timer; if(!t.started){ t.startedAt=Date.now(); t.running=true; t.started=true; t.frozenByWin=false; } }
+    function stopTimer(){ var t=state.timer; if(t.running){ t.accumulated+=Date.now()-t.startedAt; t.running=false; } }
+    function toggleTimer(){ var t=state.timer; if(t.running){ stopTimer(); t.frozenByWin=false; } else { t.startedAt=Date.now(); t.running=true; t.started=true; t.frozenByWin=false; } save(); render(); }
+    function updateClock(){ var el=document.getElementById("clock"); if(el) el.textContent=fmt(elapsedMs()); }
+
+    function snapshot(scorer){ state.history.push({ scorer:scorer,
+      points:state.points.slice(), games:state.games.slice(), sets:state.sets.slice(),
+      setHistory:state.setHistory.map(function(p){return p.slice();}),
+      tiebreak:state.tiebreak, tbPoints:state.tbPoints.slice(), server:state.server, winner:state.winner }); }
+    function restore(s){ state.points=s.points.slice(); state.games=s.games.slice(); state.sets=s.sets.slice();
+      state.setHistory=s.setHistory.map(function(p){return p.slice();});
+      state.tiebreak=s.tiebreak; state.tbPoints=s.tbPoints.slice(); state.server=s.server; state.winner=s.winner;
+      if(state.winner===null && state.timer.frozenByWin){ state.timer.startedAt=Date.now(); state.timer.running=true; state.timer.frozenByWin=false; }
     }
 
-    function setsToWin(){ return state.bestOf === 1 ? 1 : (state.bestOf+1)/2; }
+    var MAP=["0","15","30","40"];
+    function puntoTxt(side){ if(state.tiebreak) return String(state.tbPoints[side]);
+      var p=state.points[side], q=state.points[1-side];
+      if(p>=3&&q>=3){ if(p===q) return "40"; if(p===q+1) return "AD"; return "40"; } return MAP[p]; }
+    function fase(){ if(state.tiebreak) return {tipo:"tb"};
+      var p=state.points[0], q=state.points[1];
+      if(p>=3&&q>=3){ if(p===q) return {tipo:"deuce"}; return {tipo:"adv", side:p>q?0:1}; } return {tipo:"normal"}; }
 
-    /* ── Snapshot del marcador (sin la pila history) ── */
-    function snapshot(scorer){
-      state.history.push({
-        scorer: scorer,
-        points: state.points.slice(),
-        games: state.games.slice(),
-        sets: state.sets.slice(),
-        setHistory: state.setHistory.map(function(p){ return p.slice(); }),
-        tiebreak: state.tiebreak,
-        tbPoints: state.tbPoints.slice(),
-        server: state.server,
-        winner: state.winner
-      });
-    }
-    function restore(snap){
-      state.points = snap.points.slice();
-      state.games = snap.games.slice();
-      state.sets = snap.sets.slice();
-      state.setHistory = snap.setHistory.map(function(p){ return p.slice(); });
-      state.tiebreak = snap.tiebreak;
-      state.tbPoints = snap.tbPoints.slice();
-      state.server = snap.server;
-      state.winner = snap.winner;
-    }
+    function cerrarSet(i){ state.sets[i]++; state.setHistory.push([state.games[0],state.games[1]]);
+      state.games=[0,0]; state.points=[0,0]; state.tiebreak=false; state.tbPoints=[0,0];
+      if(state.sets[i] >= setsToWin()) state.winner=i; }
 
-    /* ── Texto del punto (0/15/30/40/AD) ── */
-    var MAP = ["0","15","30","40"];
-    function puntoTxt(side){
-      if(state.tiebreak) return String(state.tbPoints[side]);
-      var p = state.points[side], q = state.points[1-side];
-      if(p>=3 && q>=3){
-        if(p===q) return "40";
-        if(p===q+1) return "AD";
-        return "40";
-      }
-      return MAP[p];
-    }
-
-    /* ── Cierre de set ── */
-    function cerrarSet(i){
-      state.sets[i]++;
-      state.setHistory.push([state.games[0], state.games[1]]);
-      state.games = [0,0];
-      state.points = [0,0];
-      state.tiebreak = false;
-      state.tbPoints = [0,0];
-      state.server = 1 - state.server; // saca el otro al empezar el set nuevo
-      if(state.sets[i] >= setsToWin()){ state.winner = i; }
-    }
-
-    /* ── Sumar un punto ── */
     function add(i){
-      if(state.winner !== null) return;
-      var j = 1 - i;
-      snapshot(i);
-
-      if(state.tiebreak){
-        state.tbPoints[i]++;
-        var t=state.tbPoints[i], ot=state.tbPoints[j];
-        // cambio de saque en el tie-break cada 2 puntos (tras el 1ro)
-        if((t+ot) % 2 === 1) state.server = 1 - state.server;
-        if(t>=7 && t-ot>=2){
-          state.games[i]++;            // 7-6
-          cerrarSet(i);
-        }
-      } else {
-        state.points[i]++;
-        var p=state.points[i], q=state.points[j];
-        if(p>=4 && p-q>=2){
-          // gana el game
-          state.points = [0,0];
-          state.games[i]++;
-          state.server = 1 - state.server; // saque cambia cada game
+      if(state.winner!==null) return;
+      startTimerIfNeeded();
+      var j=1-i; snapshot(i);
+      if(state.tiebreak){ state.tbPoints[i]++; var t=state.tbPoints[i], ot=state.tbPoints[j];
+        if((t+ot)%2===1) state.server=1-state.server;
+        if(t>=7 && t-ot>=2){ state.games[i]++; state.server=1-state.server; cerrarSet(i); }
+      } else { state.points[i]++; var p=state.points[i], q=state.points[j];
+        if(p>=4 && p-q>=2){ state.points=[0,0]; state.games[i]++; state.server=1-state.server;
           var g=state.games[i], og=state.games[j];
-          if(g>=6 && g-og>=2){ cerrarSet(i); }
-          else if(g===6 && og===6){ state.tiebreak = true; state.tbPoints=[0,0]; }
-        }
-      }
+          if(g>=6 && g-og>=2) cerrarSet(i); else if(g===6 && og===6){ state.tiebreak=true; state.tbPoints=[0,0]; }
+        } }
+      if(state.winner!==null){ stopTimer(); state.timer.frozenByWin=true; }
       save(); render();
     }
+    function sub(i){ var h=state.history; if(h.length && h[h.length-1].scorer===i){ restore(h.pop()); save(); render(); } }
+    function deshacer(){ if(state.history.length){ restore(state.history.pop()); save(); render(); } }
 
-    /* ── Restar punto del jugador i (deshace SU último punto si fue el último jugado) ── */
-    function sub(i){
-      var h = state.history;
-      if(h.length && h[h.length-1].scorer === i){
-        restore(h.pop());
-        save(); render();
-      }
+    function nuevoPartido(){ state.points=[0,0]; state.games=[0,0]; state.sets=[0,0]; state.setHistory=[];
+      state.tiebreak=false; state.tbPoints=[0,0]; state.winner=null; state.history=[]; state.sharing=false;
+      state.timer={running:false,startedAt:0,accumulated:0,started:false,frozenByWin:false};
+      state.screen="serve"; save(); render(); }
+
+    function shareText(){ var w=state.winner;
+      var line=state.setHistory.map(function(g){return g[0]+"-"+g[1];}).join("  ");
+      return "🎾 "+nombre(0)+" vs "+nombre(1)+"\n"+
+             "Ganó "+nombre(w)+" 🏆\n"+
+             "Sets ("+nombre(0)+"–"+nombre(1)+"): "+line+"\n"+
+             "⏱ Tiempo jugado: "+fmt(elapsedMs());
     }
+    function shareNative(){ var txt=shareText();
+      if(navigator.share){ navigator.share({title:"Resultado del partido", text:txt}).catch(function(){}); } else { copiar(); } }
+    function copiar(){ var txt=shareText();
+      function feedback(){ var b=document.getElementById("btnCopiar"); if(b){ b.textContent="¡Copiado!"; setTimeout(function(){ if(b) b.textContent="Copiar"; },1600); } }
+      if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(feedback,function(){ legacyCopy(txt); feedback(); }); }
+      else { legacyCopy(txt); feedback(); } }
+    function legacyCopy(txt){ var ta=document.getElementById("shareBox"); if(ta){ ta.removeAttribute("readonly"); ta.select(); try{ document.execCommand("copy"); }catch(e){} ta.setAttribute("readonly","readonly"); } }
 
-    /* ── Deshacer el último punto, sea de quien sea ── */
-    function deshacer(){
-      if(state.history.length){
-        restore(state.history.pop());
-        save(); render();
-      }
-    }
-
-    /* ── Empezar / reiniciar ── */
-    function nuevoPartido(reiniciarNombres){
-      state.screen = "game";
-      state.points=[0,0]; state.games=[0,0]; state.sets=[0,0];
-      state.setHistory=[]; state.tiebreak=false; state.tbPoints=[0,0];
-      state.server=0; state.winner=null; state.history=[];
-      save(); render();
-    }
-
-    /* ───────── Render ───────── */
-    function esc(s){ return String(s).replace(/[&<>"]/g,function(c){
-      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
-
+    function esc(s){ return String(s).replace(/[&<>"]/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
     function svgMas(){ return '<svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><line x1="12" y1="5" x2="12" y2="19"/></svg>'; }
     function svgMenos(){ return '<svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></svg>'; }
 
-    function nombre(i){ return state.names[i] && state.names[i].trim() ? state.names[i].trim() : ("Jugador "+(i+1)); }
-
-    function render(){
-      var app = document.getElementById("app");
-      if(state.screen === "setup"){ app.innerHTML = setupHTML(); afterSetup(); return; }
-      app.innerHTML = boardHTML();
+    function render(){ var app=document.getElementById("app");
+      if(state.screen==="setup"){ app.innerHTML=setupHTML(); afterSetup(); return; }
+      if(state.screen==="serve"){ app.innerHTML=serveHTML(); afterServe(); return; }
+      app.innerHTML=boardHTML(); setTimeout(bindBoard,0);
     }
 
-    function setupHTML(){
-      var op = function(v,t,s){
-        return '<button class="opt'+(state.bestOf===v?' activo':'')+'" data-best="'+v+'">'+t+'<small>'+s+'</small></button>';
-      };
-      return ''+
-      '<div class="setup">'+
+    function setupHTML(){ var op=function(v,t,s){ return '<button class="opt'+(state.bestOf===v?' activo':'')+'" data-best="'+v+'">'+t+'<small>'+s+'</small></button>'; };
+      return '<div class="setup">'+
         '<img class="logo" src="./Logo.png" alt="" onerror="this.style.display=\'none\'" />'+
         '<h1 class="title">Tenis</h1>'+
         '<p class="subtitle">Anotador de partidos · puntos, games y sets</p>'+
-
-        '<div class="field"><label>Jugador 1</label>'+
-          '<input id="n0" type="text" maxlength="14" placeholder="Jugador 1" value="'+esc(state.names[0])+'" /></div>'+
-        '<div class="field"><label>Jugador 2</label>'+
-          '<input id="n1" type="text" maxlength="14" placeholder="Jugador 2" value="'+esc(state.names[1])+'" /></div>'+
-
+        '<div class="field"><label>Jugador 1</label><input id="n0" type="text" maxlength="14" placeholder="Jugador 1" value="'+esc(state.names[0])+'" /></div>'+
+        '<div class="field"><label>Jugador 2</label><input id="n1" type="text" maxlength="14" placeholder="Jugador 2" value="'+esc(state.names[1])+'" /></div>'+
         '<div class="seclabel">Cantidad de sets</div>'+
-        '<div class="opciones">'+
-          op(1,"1 set","a un set")+
-          op(3,"Al mejor de 3","gana 2 sets")+
-          op(5,"Al mejor de 5","gana 3 sets")+
-        '</div>'+
-
-        '<button class="jugar" id="jugar">¡A jugar!</button>'+
-      '</div>';
+        '<div class="opciones">'+ op(1,"1 set","a un set")+op(3,"Al mejor de 3","gana 2 sets")+op(5,"Al mejor de 5","gana 3 sets") +'</div>'+
+        '<button class="jugar" id="jugar">Continuar</button></div>';
     }
-
-    function afterSetup(){
-      var n0=document.getElementById("n0"), n1=document.getElementById("n1");
+    function afterSetup(){ var n0=document.getElementById("n0"), n1=document.getElementById("n1");
       n0.addEventListener("input", function(){ state.names[0]=n0.value; });
       n1.addEventListener("input", function(){ state.names[1]=n1.value; });
-      Array.prototype.forEach.call(document.querySelectorAll(".opt"), function(b){
-        b.addEventListener("click", function(){
-          state.bestOf = parseInt(b.getAttribute("data-best"),10);
-          render();
-        });
-      });
-      document.getElementById("jugar").addEventListener("click", function(){
-        state.names[0]=n0.value; state.names[1]=n1.value;
-        nuevoPartido();
-      });
+      Array.prototype.forEach.call(document.querySelectorAll(".opt"), function(b){ b.addEventListener("click", function(){ state.bestOf=parseInt(b.getAttribute("data-best"),10); render(); }); });
+      document.getElementById("jugar").addEventListener("click", function(){ state.names[0]=n0.value; state.names[1]=n1.value; nuevoPartido(); });
     }
 
-    function colHTML(i){
-      var saca = state.server===i;
-      var txt = puntoTxt(i);
-      var esAd = txt==="AD";
+    function serveHTML(){ return '<div class="serve">'+
+      '<div class="ball">🎾</div><h1 class="title">¿Quién saca primero?</h1>'+
+      '<div class="serve-opts">'+
+        '<button class="serve-btn" data-serve="0"><span class="dot"></span>'+esc(nombre(0))+'</button>'+
+        '<button class="serve-btn" data-serve="1"><span class="dot"></span>'+esc(nombre(1))+'</button>'+
+      '</div><div class="serve-back"><button class="link" data-act="volver">← Volver</button></div></div>';
+    }
+    function afterServe(){ Array.prototype.forEach.call(document.querySelectorAll(".serve-btn"), function(b){ b.addEventListener("click", function(){ state.server=parseInt(b.getAttribute("data-serve"),10); state.screen="game"; save(); render(); }); });
+      document.querySelector("[data-act='volver']").addEventListener("click", function(){ state.screen="setup"; render(); });
+    }
+
+    function topbarHTML(){
+      var t=state.timer; var cls = t.running ? "run" : "stop";
+      var label = t.running ? "⏸ Pausar" : (t.started ? "▶ Seguir" : "▶ Iniciar");
+      var ctrl = (state.winner!==null) ? "" : '<button class="playpause '+cls+'" data-act="toggleTimer">'+label+'</button>';
+      return '<div class="topbar"><div class="clock"><span class="ico">⏱</span><span id="clock">'+fmt(elapsedMs())+'</span></div>'+ctrl+'</div>';
+    }
+
+    function scoreboardHTML(){ var nClosed=state.setHistory.length;
+      function row(i,isHead){ var cells="";
+        cells += '<div class="sb-sets">'+ (isHead?"SETS":state.sets[i]) +'</div>';
+        for(var c=0;c<nClosed;c++){ cells += '<div class="sb-cell sb-closed">'+ (isHead?("S"+(c+1)):state.setHistory[c][i]) +'</div>'; }
+        cells += '<div class="sb-cell sb-cur">'+ (isHead?"SET":state.games[i]) +'</div>';
+        if(isHead) return '<div class="sb-row sb-head"><div class="sb-name"></div>'+cells+'</div>';
+        var saca = state.server===i ? '<span class="dot"></span>' : '';
+        return '<div class="sb-row"><div class="sb-name">'+saca+esc(nombre(i))+'</div>'+cells+'</div>';
+      }
+      return '<div class="sb">'+ row(0,true)+row(0,false)+row(1,false) +'</div>';
+    }
+
+    function bannerHTML(){ var f=fase();
+      if(f.tipo==="tb") return '<div class="banner"><span class="pill">Tie-break</span></div>';
+      if(f.tipo==="deuce") return '<div class="banner"><span class="pill deuce">Deuce · Iguales</span></div>';
+      if(f.tipo==="adv") return '<div class="banner"><span class="pill">Ventaja '+esc(nombre(f.side))+'</span></div>';
+      return '<div class="banner"><span class="calm">Saca '+esc(nombre(state.server))+'</span></div>';
+    }
+
+    function bigColHTML(i){ var txt=puntoTxt(i), esAd=(txt==="AD"); var saca=state.server===i;
       var puedeMenos = state.history.length && state.history[state.history.length-1].scorer===i;
-      return ''+
-      '<div class="pcol'+(saca?' saca':'')+'">'+
-        '<div class="pname">'+esc(nombre(i))+(saca?'<span class="saca-dot"></span>':'')+'</div>'+
-        '<div class="punto'+(esAd?' ad':'')+'">'+txt+'</div>'+
-        '<div class="games-row">Games <b>'+state.games[i]+'</b></div>'+
-        '<div class="pbtns">'+
+      return '<div class="bigcol'+(saca?' saca':'')+'">'+
+        '<div class="bigname">'+(saca?'<span class="dot" style="display:inline-block;margin-right:6px;vertical-align:middle"></span>':'')+esc(nombre(i))+'</div>'+
+        '<div class="bignum'+(esAd?' ad':'')+'">'+txt+'</div>'+
+        '<div class="bigbtns">'+
           '<button class="pbtn menos" data-act="sub" data-i="'+i+'"'+(puedeMenos?'':' disabled')+' aria-label="Restar punto a '+esc(nombre(i))+'">'+svgMenos()+'</button>'+
           '<button class="pbtn mas" data-act="add" data-i="'+i+'" aria-label="Sumar punto a '+esc(nombre(i))+'">'+svgMas()+'</button>'+
-        '</div>'+
-      '</div>';
-    }
-
-    function estadoTxt(){
-      if(state.tiebreak) return {t:"Tie-break", calmo:false};
-      var p=state.points[0], q=state.points[1];
-      if(p>=3 && q>=3){
-        if(p===q) return {t:"Iguales (deuce)", calmo:false};
-        var lider = p>q ? 0 : 1;
-        return {t:"Ventaja "+nombre(lider), calmo:false};
-      }
-      return {t:"En juego", calmo:true};
-    }
-
-    function historialHTML(){
-      if(!state.setHistory.length) return "";
-      return state.setHistory.map(function(g){
-        return '<span class="sg">'+g[0]+'-'+g[1]+'</span>';
-      }).join("");
+        '</div></div>';
     }
 
     function boardHTML(){
-      var est = estadoTxt();
-      var html = ''+
-      '<div class="board">'+
-
-        '<div class="setsbar">'+
-          '<span class="sname">'+esc(nombre(0))+'</span>'+
-          '<span class="scount">'+state.sets[0]+'</span>'+
-          '<span class="vs">SETS</span>'+
-          '<span class="scount">'+state.sets[1]+'</span>'+
-          '<span class="sname">'+esc(nombre(1))+'</span>'+
-        '</div>'+
-
-        '<div class="estado'+(est.calmo?' calmo':'')+'">'+esc(est.t)+'</div>'+
-
-        '<div class="players">'+ colHTML(0) + colHTML(1) +'</div>'+
-
-        '<div class="historial">'+ historialHTML() +'</div>'+
-
+      var html='<div class="board">'+ topbarHTML()+ scoreboardHTML()+ bannerHTML()+
+        '<div class="scorebig">'+ bigColHTML(0)+bigColHTML(1) +'</div>'+
         '<div class="acciones">'+
           '<button class="link" data-act="undo"'+(state.history.length?'':' disabled')+'>Deshacer punto</button>'+
           '<button class="link" data-act="menu">Menú / Reiniciar</button>'+
-        '</div>'+
-      '</div>';
+        '</div></div>';
 
-      // Overlay ganador
-      if(state.winner !== null){
-        var w = state.winner;
-        html += ''+
-        '<div class="overlay">'+
-          '<div class="card">'+
-            '<h2>¡Ganó '+esc(nombre(w))+'!</h2>'+
-            '<p class="res">'+esc(resultadoFinal())+'</p>'+
-            '<div class="row">'+
-              '<button class="btn solid" data-act="revancha">Revancha</button>'+
-              '<button class="btn ghost" data-act="undo">Deshacer</button>'+
-            '</div>'+
-          '</div>'+
-        '</div>';
+      if(state.winner!==null){ var w=state.winner; var line=state.setHistory.map(function(g){return g[0]+"-"+g[1];}).join("  ");
+        html+='<div class="overlay"><div class="card">'+
+          '<h2>¡Ganó '+esc(nombre(w))+'!</h2>'+
+          '<p class="res">'+esc(line)+'</p>'+
+          '<p class="tiempo">⏱ '+fmt(elapsedMs())+'</p>'+
+          '<div class="row"><button class="btn solid" data-act="share">Compartir resultado</button></div>'+
+          '<div class="row" style="margin-top:10px">'+
+            '<button class="btn ghost" data-act="revancha">Revancha</button>'+
+            '<button class="btn ghost" data-act="undo">Deshacer</button>'+
+          '</div></div></div>';
       }
-      // colgar listeners después de pintar
-      setTimeout(bindBoard, 0);
+
+      if(state.sharing){
+        html+='<div class="overlay top"><div class="card">'+
+          '<h2>Compartir</h2>'+
+          '<textarea id="shareBox" class="sharebox" rows="4" readonly>'+esc(shareText())+'</textarea>'+
+          '<div class="row">'+
+            (navigator.share ? '<button class="btn solid" data-act="share-native">Compartir</button>' : '')+
+            '<button id="btnCopiar" class="btn '+(navigator.share?'ghost':'solid')+'" data-act="share-copy">Copiar</button>'+
+            '<button class="btn ghost" data-act="share-close">Cerrar</button>'+
+          '</div></div></div>';
+      }
       return html;
     }
 
-    function resultadoFinal(){
-      // arma el line score: sets cerrados (desde el ganador)
-      return state.setHistory.map(function(g){ return g[0]+"-"+g[1]; }).join("  ");
-    }
+    function bindBoard(){ Array.prototype.forEach.call(document.querySelectorAll("[data-act]"), function(el){
+      var act=el.getAttribute("data-act");
+      el.onclick=function(){
+        if(act==="add") add(parseInt(el.getAttribute("data-i"),10));
+        else if(act==="sub") sub(parseInt(el.getAttribute("data-i"),10));
+        else if(act==="undo") deshacer();
+        else if(act==="revancha") nuevoPartido();
+        else if(act==="menu"){ state.screen="setup"; save(); render(); }
+        else if(act==="toggleTimer") toggleTimer();
+        else if(act==="share"){ state.sharing=true; render(); }
+        else if(act==="share-native") shareNative();
+        else if(act==="share-copy") copiar();
+        else if(act==="share-close"){ state.sharing=false; render(); }
+      };
+    }); }
 
-    function bindBoard(){
-      Array.prototype.forEach.call(document.querySelectorAll("[data-act]"), function(el){
-        var act = el.getAttribute("data-act");
-        el.onclick = function(){
-          if(act==="add") add(parseInt(el.getAttribute("data-i"),10));
-          else if(act==="sub") sub(parseInt(el.getAttribute("data-i"),10));
-          else if(act==="undo") deshacer();
-          else if(act==="revancha") nuevoPartido();
-          else if(act==="menu"){ state.screen="setup"; save(); render(); }
-        };
-      });
-    }
+    load(); render();
+    setInterval(updateClock, 500);
 
-    /* ── Arranque ── */
-    load();
-    render();
-
-    /* ── Anti-zoom por doble toque en zonas vacías (no sobre controles) ── */
     var ultimo=0;
-    document.addEventListener("touchend", function(e){
-      var ahora=Date.now();
-      var ctrl = e.target.closest && e.target.closest("button, input, a");
-      if(ahora-ultimo<=300 && !ctrl){ e.preventDefault(); }
-      ultimo=ahora;
-    }, {passive:false});
+    document.addEventListener("touchend", function(e){ var ahora=Date.now(); var ctrl=e.target.closest && e.target.closest("button, input, a, textarea");
+      if(ahora-ultimo<=300 && !ctrl){ e.preventDefault(); } ultimo=ahora; }, {passive:false});
     document.addEventListener("gesturestart", function(e){ e.preventDefault(); });
 
-    /* ── Service worker ── */
-    if("serviceWorker" in navigator){
-      window.addEventListener("load", function(){
-        navigator.serviceWorker.register("./sw.js").catch(function(){});
-      });
-    }
+    if("serviceWorker" in navigator){ window.addEventListener("load", function(){ navigator.serviceWorker.register("./sw.js").catch(function(){}); }); }
   })();
   </script>
 </body>
